@@ -77,7 +77,7 @@ modules.builtin
 !.mailmap
 !.cocciconfig
 !.clang-format
-
+!/KernelSU/.git/
 #
 # Generated include files
 #
