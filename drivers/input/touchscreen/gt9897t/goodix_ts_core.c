@@ -3090,7 +3090,7 @@ static int goodix_ts_remove(struct platform_device *pdev)
 	if (core_data->init_stage >= CORE_INIT_STAGE2) {
 		hw_ops->irq_enable(core_data, false);
 	#ifdef CONFIG_DRM
-		fb_unregister_client(&core_data->fb_notifier);
+		drm_unregister_client(&core_data->fb_notifier);
 	#endif
 		core_module_prob_sate = CORE_MODULE_REMOVED;
 		if (atomic_read(&core_data->ts_esd.esd_on))
