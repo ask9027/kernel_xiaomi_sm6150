@@ -6,9 +6,9 @@
 #
 # Download needed files
 KERNEL_DIR=`pwd`
-TC_BRANCH="17"
+TC_BRANCH="18"
 TC_DIR="$HOME/kernel-build-tools/clang/$TC_BRANCH"
-TC_URL="https://gitlab.com/meloalfa159/playgroundtc"
+TC_URL="https://gitlab.com/meloalfa159/clang-neutron"
 TC_GIT_BRANCH=$TC_BRANCH
 
 AK3_URL="https://github.com/meloalfa159/AnyKernel3.git"
