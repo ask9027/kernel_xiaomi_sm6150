@@ -6,22 +6,13 @@
 #
 # Download needed files
 KERNEL_DIR=`pwd`
+CLANG="neutron"
 TC_BRANCH="18"
-TC_DIR="$HOME/kernel-build-tools/clang/$TC_BRANCH"
-TC_URL="https://gitlab.com/meloalfa159/clang-neutron"
-TC_GIT_BRANCH=$TC_BRANCH
+TC_DIR="$HOME/courbet/clang-$CLANG"
 
 AK3_URL="https://github.com/meloalfa159/AnyKernel3.git"
 AK3_BRANCH="master"
-AK3_DIR="$HOME/kernel-build-tools/anykernel"
-# Check if toolchain is exist
-if ! [ -d "$TC_DIR" ]; then
-		echo "Clang not found! Cloning to $TC_DIR..."
-		if ! git clone --single-branch --depth=1 -b $TC_GIT_BRANCH $TC_URL $TC_DIR; then
-				echo "Cloning failed! Aborting..."
-				exit 1
-		fi
-fi
+AK3_DIR="$HOME/courbet/anykernel"
 
 # Check if AK3 exist	
 if ! [ -d "$AK3_DIR" ]; then
@@ -40,7 +31,7 @@ fi
 # Setup environment
 DEFCONFIG="courbet_defconfig"
 SECONDS=0 # builtin bash timer
-ZIPNAME="AlfaKernel-melo159-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="AlfaKernel-melo159-$(git describe --abbrev=0 --tags)-$(date '+%Y%m%d-%H%M').zip"
 export PROC="-j8"
 
 # Setup ccache environment
@@ -56,34 +47,36 @@ export STRIP="$TC_DIR/bin/$(echo "$(find "$TC_DIR/bin" -type f -name "aarch64-*-
 
 # Kernel Details
 KERNEL_VER="$(date '+%Y%m%d-%H%M')"
-
+OUT="$HOME/courbet/kernel-out"
 function clean_all {
 		cd $KERNEL_DIR
 		echo
 		rm -rf prebuilt
-		rm -rf out && make clean && make mrproper
+		rm -rf out && rm -rf $OUT
 }
 
-while read -p "Do you want to clean stuffs (y/n)? " cchoice
-do
-case "$cchoice" in
-	y|Y )
-		clean_all
-		echo
-		echo "All Cleaned now."
-		break
-		;;
-	n|N )
-		echo
-		break
-		;;
-	* )
-		echo
-		echo "Invalid try again!"
-		echo
-		;;
-esac
-done
+if [ -d "$OUT" ]; then 
+                      while read -p "Do you want to clean stuffs (y/n)? " cchoice
+                      do
+                      case "$cchoice" in
+	                      y|Y )
+		                      clean_all
+		                      echo
+		                      echo "All Cleaned now."
+		                      break
+		                      ;;
+	                      n|N )
+		                      echo
+		                      break
+		                      ;;
+	                      * )
+		                      echo
+		                      echo "Invalid try again!"
+		                      echo
+		                      ;;
+                     esac
+                     done
+fi
 
 # Delete old file before build
 if [[ $1 = "-c" || $1 = "--clean" ]]; then
@@ -91,8 +84,7 @@ if [[ $1 = "-c" || $1 = "--clean" ]]; then
 fi
 
 # Make out folder
-OUT="$HOME/kernel-out"
-mkdir -p $HOME/kernel-out
+mkdir -p $HOME/courbet/kernel-out
 make  $PROC O=$OUT ARCH=arm64 $DEFCONFIG \
 		CLANG_PATH=$TC_DIR/bin \
 		CC="ccache clang" \
@@ -163,13 +155,11 @@ function create_prebuilt {
 		cp $OUT/arch/arm64/boot/Image.gz prebuilt
 		cp $OUT/arch/arm64/boot/dtbo.img prebuilt
 		cp $OUT/arch/arm64/boot/dtb.img prebuilt
-		rm -rf $OUT
-		make clean
 }
 
 if [ -f "$OUT/arch/arm64/boot/Image.gz" ] && [ -f "$OUT/arch/arm64/boot/dtbo.img" ]; then
-		 echo -e "\nKernel compiled succesfully! Zipping up...\n"
-		while read -p "Do you want to create Zip file (y/n/p)? " cchoice
+		 echo -e "\nKernel compiled succesfully!\n"
+		while read -p "Do you want to create Zip file (y) or prebuilt (p)? (y/n/p) " cchoice
 		do
 		case "$cchoice" in
 			y|Y )
