@@ -7674,15 +7674,15 @@ static inline bool task_fits_max(struct task_struct *p, int cpu)
 	if (capacity == max_capacity)
 		return true;
 
-		if (task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
-			task_boost > 0 ||
+	if (task_boost_policy(p) == SCHED_BOOST_ON_BIG ||
+		task_boost > 0 ||
 #ifdef CONFIG_SCHED_TUNE
-			schedtune_task_boost(p) > 0 ||
+		schedtune_task_boost(p) > 0 ||
 #elif  CONFIG_UCLAMP_TASK
-			uclamp_boosted(p) > 0 ||
+		uclamp_boosted(p) > 0 ||
 #endif
-			is_min_capacity_cpu(cpu))
-		return false;
+		is_min_capacity_cpu(cpu))
+	return false;
 
 	return task_fits_capacity(p, capacity, cpu);
 }
